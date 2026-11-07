@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="https://www.thymeleaf.org" th:fragment="html (head, content)">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  
+  <title th:if="${head == null}" th:text="${site.title}">江南烟雨</title>
+  <th:block th:if="${head != null}">
+    <th:block th:replace="${head}" />
+  </th:block>
+  <meta name="description" th:content="${site.subtitle}">
+  
+  <!-- 图标 -->
+  <link rel="icon" th:if="${site.favicon != null and !#strings.isEmpty(site.favicon)}" th:href="${site.favicon}">
+  
+  <!-- 明暗模式：在样式加载前落定，避免首屏闪烁 -->
+  <script>
+    (function () {
+      var saved = null;
+      try { saved = localStorage.getItem('jn-theme'); } catch (e) {}
+      var dark = saved ? saved === 'dark'
+        : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    })();
+  </script>
+  
+  <!-- 霞鹜文楷：走 gcore 镜像（实测可用）；未加载成功时由系统宋体兜底 -->
+  <link rel="preconnect" href="https://gcore.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="https://gcore.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css" media="print" onload="this.media='all'">
+  
+  <!-- 主题样式 -->
+  <link rel="stylesheet" th:href="@{/themes/jiangnan-misty-rain/assets/css/main.css?v={version}(version=${theme.spec.version})}">
+  
+  <!-- Halo 公共资源 -->
+  <!-- 插件与公共头部资源由 Halo 自动注入 -->
+</head>
+<body th:style="'--accent:' + ${theme.config?.basic?.accent_color ?: '#B4432F'} + ';'">
+  <!-- 装饰层：江南山水背景 -->
+  <div class="landscape-bg" th:if="${theme.config?.effect?.show_mountain != false}">
+    <div class="mountains"></div>
+    <div class="bamboo-forest"></div>
+  </div>
+  
+  <!-- 装饰层：雨滴 -->
+  <div class="rain" id="rain" th:if="${theme.config?.effect?.show_rain != false}"></div>
+  
+  <!-- 装饰层：烟雾 -->
+  <div class="mist" th:if="${theme.config?.effect?.show_mist != false}">
+    <div class="mist-layer" style="animation-delay: 0s;"></div>
+    <div class="mist-layer" style="animation-delay: 7s;"></div>
+    <div class="mist-layer" style="animation-delay: 14s;"></div>
+  </div>
+
+  <!-- 主包装器 -->
+  <div class="site-wrapper">
+    
+    <!-- 头部导航 -->
+    <header class="site-header">
+      <div class="site-container">
+        <nav class="site-nav">
+          <!-- 站点标题 -->
+          <a class="site-title" th:href="@{/}" th:text="${site.title}">江南烟雨</a>
+          
+          <!-- 导航菜单 -->
+          <ul class="nav-menu">
+            <li><a class="nav-link" data-nav="home" th:href="@{/}">首页</a></li>
+            <li><a class="nav-link" data-nav="archives" th:href="@{/archives}">归档</a></li>
+            <li><a class="nav-link" data-nav="categories" th:href="@{/categories}">分类</a></li>
+            <li><a class="nav-link" data-nav="tags" th:href="@{/tags}">标签</a></li>
+            <li><a class="nav-link" data-nav="links" th:href="@{/links}">友链</a></li>
+          </ul>
+          
+          <!-- 明暗切换 -->
+          <button class="theme-toggle" id="themeToggle" type="button" aria-label="切换明暗模式" title="切换明暗模式">
+            <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+            <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.2M12 19.8V22M2 12h2.2M19.8 12H22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M19.1 4.9l-1.6 1.6M6.5 17.5l-1.6 1.6"/></svg>
+          </button>
+        </nav>
+      </div>
+    </header>
+    
+    <!-- 主内容区 -->
+    <main class="site-main">
+      <div class="site-container">
+        <!-- 页面内容插槽 -->
+        <th:block th:replace="${content}" />
+      </div>
+    </main>
+    
+    <!-- 页脚 -->
+    <footer class="site-footer">
+      <div class="site-container">
+        <div class="footer-content">
+          <p class="footer-poetry" th:text="${theme.config?.basic?.footer_poetry ?: '君到姑苏见，人家尽枕河'}">君到姑苏见，人家尽枕河</p>
+          <p class="footer-info">
+            &copy; <span th:text="${#dates.year(#dates.createNow())}">2026</span>
+            <a th:href="@{/}" th:text="${site.title}">江南烟雨</a>
+            |
+            Powered by <a href="https://www.halo.run" target="_blank" rel="noopener">Halo</a>
+            |
+            Theme <a href="https://www.jfsv.cn" target="_blank" rel="noopener">江南烟雨</a>
+          </p>
+          
+          <!-- 代码注入区：备案号、公安备案及插件页脚脚本 -->
+          <div class="footer-beian">
+            <halo:footer />
+          </div>
+        </div>
+      </div>
+    </footer>
+    
+  </div>
+  
+  <!-- 雨滴生成脚本 -->
+  <script>
+    (function() {
+      const rainContainer = document.getElementById('rain');
+      if (!rainContainer) return;
+      
+      // 根据屏幕宽度动态调整雨滴数量
+      const isMobile = window.innerWidth < 768;
+      const configured = /*[[${theme.config?.effect?.rain_count ?: 80}]]*/ 80;
+      const dropCount = isMobile ? Math.round(configured * 0.5) : configured;
+      
+      for (let i = 0; i < dropCount; i++) {
+        const drop = document.createElement('div');
+        drop.className = 'rain-drop';
+        drop.style.left = Math.random() * 100 + '%';
+        drop.style.animationDelay = Math.random() * 2 + 's';
+        drop.style.animationDuration = (Math.random() * 0.5 + 1) + 's';
+        rainContainer.appendChild(drop);
+      }
+    })();
+  </script>
+  
+  <!-- 明暗切换 + 当前导航高亮 -->
+  <script>
+    (function () {
+      var root = document.documentElement;
+
+      // 切换明暗
+      var btn = document.getElementById('themeToggle');
+      if (btn) {
+        btn.addEventListener('click', function () {
+          var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+          root.classList.add('theme-anim');
+          root.setAttribute('data-theme', next);
+          try { localStorage.setItem('jn-theme', next); } catch (e) {}
+          window.setTimeout(function () { root.classList.remove('theme-anim'); }, 400);
+        });
+      }
+
+      // 按当前路径高亮导航
+      var path = location.pathname.replace(/\/+$/, '') || '/';
+      var key = 'home';
+      if (path.indexOf('/archives') === 0) key = 'archives';
+      else if (path.indexOf('/categories') === 0) key = 'categories';
+      else if (path.indexOf('/tags') === 0) key = 'tags';
+      else if (path.indexOf('/links') === 0) key = 'links';
+
+      document.querySelectorAll('.nav-link').forEach(function (a) {
+        if (a.getAttribute('data-nav') === key) a.classList.add('active');
+        else a.classList.remove('active');
+      });
+    })();
+  </script>
+  
+  <!-- Halo 公共脚本 -->
+  <!-- 页脚脚本由 Halo 自动注入 -->
+
+</body>
+</html>
+

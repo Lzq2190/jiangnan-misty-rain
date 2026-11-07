@@ -1,0 +1,20 @@
+apiVersion: theme.halo.run/v1alpha1
+kind: Theme
+metadata:
+  name: jiangnan-misty-rain
+spec:
+  displayName: 江南烟雨
+  author:
+    name: jfsv.cn
+    website: https://www.jfsv.cn
+  description: 青砖黛瓦，烟雨江南 — 传承中国古典建筑美学的博客主题。远山如黛、细雨如丝、飞檐窗棂、水墨晕染，让每一篇文字都沉浸在诗意的江南意境中。
+  logo: /themes/jiangnan-misty-rain/assets/images/logo.svg
+  homepage: https://www.jfsv.cn
+  repo: https://github.com/Lzq2190/jiangnan-misty-rain
+  settingName: "jiangnan-setting"
+  configMapName: "jiangnan-configMap"
+  version: 1.2.3
+  requires: ">=2.20.0"
+  license:
+    - name: "MIT"
+      url: "https://opensource.org/licenses/MIT"

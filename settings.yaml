@@ -1,0 +1,55 @@
+apiVersion: v1alpha1
+kind: Setting
+metadata:
+  name: jiangnan-setting
+spec:
+  forms:
+    - group: basic
+      label: 基础设置
+      formSchema:
+        - $formkit: text
+          name: hero_title
+          label: 首页大标题
+          value: 江南烟雨
+          help: 留空则使用站点标题
+        - $formkit: text
+          name: hero_subtitle
+          label: 首页副标题
+          value: 青砖黛瓦，烟雨江南
+          help: 展现在大标题下方的一句话
+        - $formkit: text
+          name: footer_poetry
+          label: 页脚诗句
+          value: 君到姑苏见，人家尽枕河
+          help: 显示在页脚的诗句，出自杜荀鹤《送人游吴》
+        - $formkit: color
+          name: accent_color
+          label: 强调色
+          value: "#B4432F"
+          help: 按钮、链接悬停等强调元素的颜色，默认梅红
+    - group: effect
+      label: 氛围效果
+      formSchema:
+        - $formkit: checkbox
+          name: show_rain
+          label: 显示雨滴
+          value: true
+          help: 关闭可减少动画开销，移动端默认自动关闭
+        - $formkit: checkbox
+          name: show_mist
+          label: 显示烟雾
+          value: true
+          help: 缓慢飘移的江南水汽效果
+        - $formkit: checkbox
+          name: show_mountain
+          label: 显示远山
+          value: true
+          help: 页面底部的江南山水剪影
+        - $formkit: number
+          name: rain_count
+          label: 雨滴数量
+          value: 80
+          min: 0
+          max: 200
+          step: 10
+          help: 桌面端雨滴数量，建议 40-120
